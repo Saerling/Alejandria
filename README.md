@@ -4,6 +4,10 @@ Repositorio de extensiones para **Shiori**, con el mismo formato que Mihon, Komi
 
 **Añadirlo en Shiori:** Extensiones → Repositorios → `Saerling/Alejandria`
 
+## Panel
+
+**https://saerling.github.io/Alejandria/**: ver, moderar (editar, pausar, eliminar), aprobar solicitudes y añadir extensiones con solo el nombre y el enlace. Las solicitudes llegan desde [este formulario](https://github.com/Saerling/Alejandria/issues/new?template=solicitud.yml).
+
 ## Crear una extensión desde el celular (sin código)
 
 1. En GitHub abre **Actions → Nueva extensión → Run workflow**.

@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b0b0f">
+<title>Alejandría · Panel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23d9c7ff'/%3E%3Ctext x='32' y='45' font-size='36' font-family='Georgia' text-anchor='middle' fill='%230b0b0f'%3EA%3C/text%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#0b0b0f; --bg2:#121218; --card:#17171f; --card2:#1e1e28; --line:rgba(255,255,255,.07);
+  --text:#f4f3f8; --muted:#9a98a8; --dim:#6c6a7a;
+  --acc:#c9b6ff; --acc2:#8f7bff; --ok:#7ee0a8; --warn:#ffd27a; --bad:#ff8a8a; --pink:#ff9ecb;
+  --r:22px; --cap:999px;
+  --sh:0 10px 40px rgba(0,0,0,.45);
+  --ease:cubic-bezier(.2,.8,.2,1);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+body{min-height:100vh;background:
+  radial-gradient(1100px 600px at 85% -10%,rgba(143,123,255,.16),transparent 60%),
+  radial-gradient(900px 500px at -10% 10%,rgba(255,158,203,.08),transparent 60%),var(--bg)}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:inherit}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px 120px}
+
+/* Barra superior translúcida */
+header{position:sticky;top:0;z-index:20;backdrop-filter:saturate(160%) blur(22px);-webkit-backdrop-filter:saturate(160%) blur(22px);
+  background:rgba(11,11,15,.72);border-bottom:1px solid var(--line)}
+.top{max-width:1080px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;gap:14px}
+.logo{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font:700 20px Georgia,serif;color:#0b0b0f;
+  background:linear-gradient(135deg,#e7dcff,#b9a4ff);box-shadow:0 6px 20px rgba(185,164,255,.35)}
+.brand{display:flex;flex-direction:column;line-height:1.1}
+.brand b{font-size:17px;letter-spacing:-.01em}
+.brand span{font-size:12px;color:var(--muted)}
+.sp{flex:1}
+.build{display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:var(--cap);background:var(--card);border:1px solid var(--line);
+  font-size:13px;color:var(--muted);text-decoration:none;transition:background .2s}
+.build:hover{background:var(--card2)}
+.build{white-space:nowrap}
+@media(max-width:560px){.brand span{display:none}.top{gap:10px;padding:12px 16px}.build{padding:8px 12px;font-size:12px}}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--dim)}
+.dot.ok{background:var(--ok);box-shadow:0 0 10px var(--ok)}
+.dot.bad{background:var(--bad);box-shadow:0 0 10px var(--bad)}
+.dot.run{background:var(--warn);animation:pulso 1.1s infinite}
+@keyframes pulso{50%{opacity:.35;transform:scale(.8)}}
+
+/* Botones cápsula */
+.btn{border:0;cursor:pointer;border-radius:var(--cap);padding:10px 18px;font-weight:600;font-size:14px;display:inline-flex;align-items:center;gap:8px;
+  transition:transform .15s var(--ease),background .2s,opacity .2s;background:var(--card2);color:var(--text)}
+.btn:active{transform:scale(.96)}
+.btn.pri{background:var(--text);color:#0b0b0f}
+.btn.acc{background:var(--acc);color:#0b0b0f}
+.btn.ghost{background:transparent;border:1px solid var(--line)}
+.btn.danger{background:rgba(255,138,138,.12);color:var(--bad)}
+.btn[disabled]{opacity:.45;pointer-events:none}
+.icon{width:36px;height:36px;padding:0;justify-content:center;flex:none}
+svg{width:18px;height:18px;flex:none}
+
+/* Encabezado y estadísticas */
+.hero{padding:34px 0 8px}
+.hero h1{font-size:clamp(30px,5vw,44px);letter-spacing:-.035em;margin:0 0 6px;font-weight:800}
+.hero p{margin:0;color:var(--muted)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:24px 0 8px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px}
+.stat b{display:block;font-size:28px;letter-spacing:-.03em}
+.stat span{font-size:12.5px;color:var(--muted)}
+@media(max-width:640px){.stats{grid-template-columns:repeat(2,1fr)}}
+
+/* Pestañas segmentadas */
+.seg{position:relative;display:inline-flex;background:var(--card);border:1px solid var(--line);border-radius:var(--cap);padding:4px;margin:22px 0 18px}
+.seg button{position:relative;z-index:1;border:0;background:none;cursor:pointer;padding:9px 18px;border-radius:var(--cap);font-weight:600;font-size:14px;color:var(--muted);transition:color .25s}
+.seg button.on{color:#0b0b0f}
+.seg .pill{position:absolute;top:4px;bottom:4px;border-radius:var(--cap);background:var(--text);transition:left .35s var(--ease),width .35s var(--ease)}
+.seg .n{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 6px;margin-left:6px;border-radius:var(--cap);background:var(--pink);color:#0b0b0f;font-size:11px}
+
+/* Barra de filtros */
+.tools{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
+.search{flex:1;min-width:200px;display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:var(--cap);padding:0 16px}
+.search input{flex:1;border:0;background:none;outline:none;padding:12px 0;font-size:15px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:var(--card);border-radius:var(--cap);padding:8px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .2s}
+.chip.on{background:var(--acc);color:#0b0b0f;border-color:transparent}
+
+/* Tarjetas de extensión */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:14px;
+  transition:transform .3s var(--ease),box-shadow .3s,border-color .3s;animation:entra .45s var(--ease) both}
+.card:hover{transform:translateY(-2px);box-shadow:var(--sh);border-color:rgba(255,255,255,.12)}
+.card.off{opacity:.62}
+@keyframes entra{from{opacity:0;transform:translateY(10px) scale(.98)}}
+.row{display:flex;align-items:center;gap:14px}
+.ico{width:54px;height:54px;border-radius:16px;flex:none;object-fit:cover;background:var(--card2)}
+.meta{min-width:0;flex:1}
+.meta b{display:block;font-size:16.5px;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.meta a{display:block;font-size:13px;color:var(--muted);text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.meta a:hover{color:var(--acc)}
+.tags{display:flex;gap:6px;flex-wrap:wrap}
+.tag{font-size:11.5px;font-weight:600;padding:5px 10px;border-radius:var(--cap);background:var(--card2);color:var(--muted)}
+.tag.ok{background:rgba(126,224,168,.12);color:var(--ok)}
+.tag.warn{background:rgba(255,210,122,.12);color:var(--warn)}
+.tag.off{background:rgba(255,255,255,.06);color:var(--dim)}
+.tag.nsfw{background:rgba(255,158,203,.13);color:var(--pink)}
+.acts{display:flex;gap:8px;border-top:1px solid var(--line);padding-top:12px}
+.acts .btn{padding:8px 12px;font-size:13px}
+.acts .sp{flex:1}
+
+/* Vacíos y avisos */
+.empty{text-align:center;color:var(--muted);padding:60px 20px;border:1px dashed var(--line);border-radius:var(--r)}
+.empty b{display:block;color:var(--text);font-size:18px;margin-bottom:6px}
+
+/* Formularios */
+.panel{background:var(--card);border:1px solid var(--line);border-radius:28px;padding:26px;max-width:640px}
+.f{display:flex;flex-direction:column;gap:7px;margin-bottom:16px}
+.f label{font-size:13px;font-weight:600;color:var(--muted)}
+.f small{font-size:12px;color:var(--dim)}
+.in{width:100%;background:var(--bg2);border:1px solid var(--line);border-radius:16px;padding:13px 16px;font-size:15px;outline:none;transition:border-color .2s,box-shadow .2s}
+.in:focus{border-color:var(--acc2);box-shadow:0 0 0 4px rgba(143,123,255,.18)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.switch{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--bg2);border:1px solid var(--line);border-radius:16px;padding:12px 16px;cursor:pointer}
+.switch input{display:none}
+.tg{width:46px;height:28px;border-radius:var(--cap);background:#33323d;position:relative;transition:background .25s;flex:none}
+.tg::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:transform .3s var(--ease)}
+.switch input:checked + .tg{background:var(--pink)}
+.switch input:checked + .tg::after{transform:translateX(18px)}
+details.adv{margin:4px 0 18px;border:1px solid var(--line);border-radius:16px;padding:0 16px;background:var(--bg2)}
+details.adv summary{cursor:pointer;padding:13px 0;font-size:14px;font-weight:600;color:var(--muted);list-style:none}
+details.adv summary::-webkit-details-marker{display:none}
+details.adv[open] summary{color:var(--text)}
+.preview{display:flex;align-items:center;gap:14px;background:var(--bg2);border:1px solid var(--line);border-radius:18px;padding:14px;margin-bottom:18px}
+.preview code{font-size:12px;color:var(--muted);word-break:break-all}
+.subir{font-size:12.5px;color:var(--acc);cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+
+/* Hoja / diálogo */
+.velo{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:grid;place-items:end center;
+  opacity:0;pointer-events:none;transition:opacity .25s}
+.velo.on{opacity:1;pointer-events:auto}
+.hoja{width:min(640px,100%);max-height:92vh;overflow:auto;background:#15151c;border:1px solid var(--line);border-radius:30px 30px 0 0;padding:22px 24px 30px;
+  transform:translateY(40px);transition:transform .4s var(--ease)}
+.velo.on .hoja{transform:none}
+@media(min-width:700px){.velo{place-items:center}.hoja{border-radius:30px}}
+.agarre{width:42px;height:5px;border-radius:9px;background:#3a3946;margin:0 auto 16px}
+.hoja h2{margin:0 0 4px;font-size:22px;letter-spacing:-.02em}
+.hoja p.sub{margin:0 0 18px;color:var(--muted);font-size:14px}
+.pie{display:flex;gap:10px;justify-content:flex-end;margin-top:8px;flex-wrap:wrap}
+
+/* Avisos flotantes */
+#toasts{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:80;display:flex;flex-direction:column;gap:8px;align-items:center}
+.toast{background:rgba(30,30,40,.96);border:1px solid var(--line);border-radius:var(--cap);padding:12px 18px;font-size:14px;box-shadow:var(--sh);
+  animation:sube .35s var(--ease) both;display:flex;gap:10px;align-items:center;max-width:90vw}
+.toast.bad{color:var(--bad)}
+@keyframes sube{from{opacity:0;transform:translateY(14px) scale(.96)}}
+
+/* Inicio de sesión */
+.login{min-height:100vh;display:grid;place-items:center;padding:20px}
+.login .panel{width:min(460px,100%);text-align:center;padding:34px 28px}
+.login .logo{width:64px;height:64px;font-size:34px;border-radius:20px;margin:0 auto 18px}
+.login h1{margin:0 0 6px;font-size:28px;letter-spacing:-.03em}
+.login p{color:var(--muted);margin:0 0 22px;font-size:14.5px;line-height:1.5}
+.login ol{text-align:left;color:var(--muted);font-size:13.5px;line-height:1.6;padding-left:20px;margin:0 0 20px}
+.login ol a{color:var(--acc)}
+
+.spin{width:16px;height:16px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:gira .7s linear infinite}
+@keyframes gira{to{transform:rotate(360deg)}}
+.skel{height:150px;border-radius:var(--r);background:linear-gradient(90deg,var(--card) 0%,var(--card2) 50%,var(--card) 100%);background-size:200% 100%;animation:brillo 1.3s infinite}
+@keyframes brillo{to{background-position:-200% 0}}
+.req .quien{font-size:12.5px;color:var(--dim)}
+.req .nota{font-size:13.5px;color:var(--muted);white-space:pre-wrap;background:var(--bg2);border-radius:14px;padding:10px 12px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="toasts"></div>
+<div class="velo" id="velo"><div class="hoja" id="hoja"></div></div>
+
+<script>
+"use strict";
+const DUENO = "Saerling", REPO = "Alejandria", RAMA = "main";
+const API = `https://api.github.com/repos/${DUENO}/${REPO}`;
+const IDIOMAS = {es:"Español",en:"Inglés",pt:"Portugués",fr:"Francés",it:"Italiano",de:"Alemán",ja:"Japonés",ko:"Coreano",zh:"Chino",ru:"Ruso",id:"Indonesio",vi:"Vietnamita",tr:"Turco",all:"Varios"};
+const BANDERAS = {es:"🇪🇸",en:"🇬🇧",pt:"🇧🇷",fr:"🇫🇷",it:"🇮🇹",de:"🇩🇪",ja:"🇯🇵",ko:"🇰🇷",zh:"🇨🇳",ru:"🇷🇺",id:"🇮🇩",vi:"🇻🇳",tr:"🇹🇷",all:"🌐"};
+const AVANZADOS = [
+  ["biblioteca","Página con todas las obras","/manga/"],
+  ["recientes","Últimas actualizaciones","/"],
+  ["busqueda","Búsqueda ({q} = lo buscado)","/?s={q}"],
+  ["imagenes","Selector CSS de las imágenes","(automático)"],
+];
+
+const I = {
+  web:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.8 3 2.8 15 0 18M12 3c-2.8 3-2.8 15 0 18"/></svg>',
+  edit:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>',
+  pause:'<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1.5"/><rect x="14" y="5" width="4" height="14" rx="1.5"/></svg>',
+  play:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg>',
+  del:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>',
+  up:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M6 11l6-6 6 6"/></svg>',
+  plus:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+  find:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>',
+  ref:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/></svg>',
+  out:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h11"/></svg>',
+  ok:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg>',
+  no:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>',
+  rocket:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c1-3 2-4 4-5M14 4c3 0 6 3 6 6l-7 7-6-6 7-7zM9 11l-4 1-2 3 4 1M13 15l-1 4-3 2-1-4"/></svg>',
+};
+
+// ───────────── Estado ─────────────
+const S = {
+  token: localStorage.getItem("alj_token") || "",
+  exts: [], indice: [], solicitudes: [], build: null,
+  pestana: "ext", filtro: "todas", q: "", cargando: true,
+};
+const $ = (s, r = document) => r.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const host = u => { try { return new URL(u).host.replace(/^www\./, ""); } catch { return u; } };
+
+function aviso(texto, malo = false) {
+  const t = document.createElement("div");
+  t.className = "toast" + (malo ? " bad" : "");
+  t.innerHTML = (malo ? I.no : I.ok) + `<span>${esc(texto)}</span>`;
+  $("#toasts").appendChild(t);
+  setTimeout(() => { t.style.transition = "opacity .3s"; t.style.opacity = 0; setTimeout(() => t.remove(), 300); }, malo ? 6000 : 3200);
+}
+
+// ───────────── GitHub ─────────────
+async function gh(ruta, op = {}) {
+  const r = await fetch(ruta.startsWith("http") ? ruta : API + ruta, {
+    ...op,
+    headers: { Accept: "application/vnd.github+json", Authorization: `Bearer ${S.token}`, "X-GitHub-Api-Version": "2022-11-28", ...(op.body ? {"Content-Type": "application/json"} : {}) },
+  });
+  if (r.status === 204) return null;
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(d.message ? `${d.message} (${r.status})` : `Error ${r.status}`);
+  return d;
+}
+const b64 = s => btoa(unescape(encodeURIComponent(s)));
+const desB64 = s => decodeURIComponent(escape(atob(s.replace(/\n/g, ""))));
+
+/**
+ * Un solo commit con varios cambios (así se compila una sola vez).
+ * cambios: [{ruta, texto}] | [{ruta, base64}] | [{ruta, borrar:true}]
+ */
+async function commit(mensaje, cambios) {
+  const ref = await gh(`/git/ref/heads/${RAMA}`);
+  const padre = await gh(`/git/commits/${ref.object.sha}`);
+  const arbol = [];
+  for (const c of cambios) {
+    if (c.borrar) { arbol.push({ path: c.ruta, mode: "100644", type: "blob", sha: null }); continue; }
+    const blob = await gh("/git/blobs", { method: "POST", body: JSON.stringify(
+      c.base64 != null ? { content: c.base64, encoding: "base64" } : { content: c.texto, encoding: "utf-8" }) });
+    arbol.push({ path: c.ruta, mode: "100644", type: "blob", sha: blob.sha });
+  }
+  const t = await gh("/git/trees", { method: "POST", body: JSON.stringify({ base_tree: padre.tree.sha, tree: arbol }) });
+  const nuevo = await gh("/git/commits", { method: "POST", body: JSON.stringify({ message: mensaje, tree: t.sha, parents: [padre.sha] }) });
+  await gh(`/git/refs/heads/${RAMA}`, { method: "PATCH", body: JSON.stringify({ sha: nuevo.sha }) });
+  return nuevo.sha;
+}
+
+// ───────────── extension.properties ─────────────
+function leerProps(texto) {
+  const p = {};
+  texto.split(/\r?\n/).forEach(l => {
+    l = l.trim();
+    if (!l || l.startsWith("#") || !l.includes("=")) return;
+    const i = l.indexOf("=");
+    p[l.slice(0, i).trim()] = l.slice(i + 1).trim();
+  });
+  return p;
+}
+function escribirProps(p) {
+  let s = `nombre=${p.nombre}\nurl=${p.url}\n# Súbelo en 1 cada vez que cambies algo, para que Shiori ofrezca la actualización.\nversion=${p.version}\nnsfw=${p.nsfw ? "true" : "false"}\n`;
+  if (p.activa === false) s += "# Pausada desde el panel: no se compila ni se publica.\nactiva=false\n";
+  const extra = AVANZADOS.filter(([k]) => p[k]);
+  if (extra.length) s += "\n# Opcionales\n" + extra.map(([k]) => `${k}=${p[k]}`).join("\n") + "\n";
+  return s;
+}
+function slug(nombre) {
+  let s = nombre.normalize("NFKD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]/g, "");
+  if (!s || /^\d/.test(s)) s = "w" + s;
+  return s;
+}
+
+// ───────────── Iconos ─────────────
+function colorDe(t) { let h = 0; for (const c of t) h = (h * 31 + c.charCodeAt(0)) >>> 0; return `hsl(${h % 360} 45% 52%)`; }
+function iconoLetra(nombre, tam = 192) {
+  const c = document.createElement("canvas"); c.width = c.height = tam;
+  const x = c.getContext("2d");
+  x.fillStyle = colorDe(nombre);
+  x.beginPath(); x.roundRect(0, 0, tam, tam, tam / 4); x.fill();
+  const g = x.createLinearGradient(0, 0, tam, tam); g.addColorStop(0, "rgba(255,255,255,.18)"); g.addColorStop(1, "rgba(0,0,0,.15)");
+  x.fillStyle = g; x.fill();
+  x.fillStyle = "#fff"; x.font = `700 ${tam * .52}px Inter, sans-serif`; x.textAlign = "center"; x.textBaseline = "middle";
+  x.fillText((nombre.trim()[0] || "?").toUpperCase(), tam / 2, tam / 2 + tam * .03);
+  return c.toDataURL("image/png");
+}
+function iconoDeArchivo(archivo, tam = 192) {
+  return new Promise((ok, mal) => {
+    const img = new Image();
+    img.onload = () => {
+      const c = document.createElement("canvas"); c.width = c.height = tam;
+      const x = c.getContext("2d"); const l = Math.min(img.width, img.height);
+      x.drawImage(img, (img.width - l) / 2, (img.height - l) / 2, l, l, 0, 0, tam, tam);
+      ok(c.toDataURL("image/png"));
+    };
+    img.onerror = mal;
+    img.src = URL.createObjectURL(archivo);
+  });
+}
+const rawIcono = e => `https://raw.githubusercontent.com/${DUENO}/${REPO}/${RAMA}/${e.dir}/res/mipmap-xxxhdpi/ic_launcher.png?v=${e.iconoSha || ""}`;
+
+// ───────────── Carga ─────────────
+async function cargarTodo() {
+  S.cargando = true; pintar();
+  try {
+    const arbol = await gh(`/git/trees/${RAMA}?recursive=1`);
+    const archivos = arbol.tree;
+    const props = archivos.filter(f => /^src\/[^/]+\/[^/]+\/extension\.properties$/.test(f.path));
+    S.exts = await Promise.all(props.map(async f => {
+      const blob = await gh(`/git/blobs/${f.sha}`);
+      const p = leerProps(desB64(blob.content));
+      const [, lang, id] = f.path.split("/");
+      const dir = `src/${lang}/${id}`;
+      const ico = archivos.find(a => a.path === `${dir}/res/mipmap-xxxhdpi/ic_launcher.png`);
+      const codigo = archivos.some(a => a.path.startsWith(`${dir}/src/`) && a.path.endsWith(".kt"));
+      return { dir, lang, id, p, iconoSha: ico?.sha, tieneIcono: !!ico, codigo, pkg: `eu.kanade.tachiyomi.extension.${lang}.alejandria.${id}` };
+    }));
+    S.exts.sort((a, b) => a.p.nombre.localeCompare(b.p.nombre));
+    try {
+      const idx = await gh(`/contents/index.min.json?ref=repo`);
+      S.indice = JSON.parse(desB64(idx.content));
+    } catch { S.indice = []; }
+    await Promise.all([cargarSolicitudes(), cargarBuild()]);
+  } catch (e) { aviso("No se pudo cargar: " + e.message, true); }
+  S.cargando = false; pintar();
+}
+async function cargarSolicitudes() {
+  // La etiqueta «solicitud» la usa el formulario de GitHub: se crea si aún no existe.
+  try { await gh(`/labels/solicitud`); } catch { try { await gh(`/labels`, { method: "POST", body: JSON.stringify({ name: "solicitud", color: "c9b6ff", description: "Pedido de una extensión nueva" }) }); } catch {} }
+  try {
+    const l = await gh(`/issues?state=open&labels=solicitud&per_page=50`);
+    S.solicitudes = l.filter(i => !i.pull_request).map(i => ({ ...i, datos: leerSolicitud(i.body || "", i.title) }));
+  } catch { S.solicitudes = []; }
+}
+function leerSolicitud(body, titulo) {
+  const campo = n => { const m = body.match(new RegExp(`###\\s*${n}\\s*\\n+([\\s\\S]*?)(?=\\n###|$)`, "i")); const v = m ? m[1].trim() : ""; return v === "_No response_" ? "" : v; };
+  const url = campo("Dirección") || (body.match(/https?:\/\/\S+/) || [""])[0];
+  return {
+    nombre: campo("Nombre de la web") || titulo.replace(/^\[Solicitud\]\s*/i, ""),
+    url, idioma: campo("Idioma") || "es",
+    nsfw: /\[x\]\s*Tiene contenido \+18/i.test(body),
+    notas: campo("Notas \\(opcional\\)"),
+  };
+}
+let sondeo = null;
+async function cargarBuild() {
+  try {
+    const r = await gh(`/actions/workflows/compilar.yml/runs?per_page=1&branch=${RAMA}`);
+    S.build = r.workflow_runs[0] || null;
+  } catch { S.build = null; }
+  clearTimeout(sondeo);
+  if (S.build && S.build.status !== "completed") sondeo = setTimeout(async () => {
+    const antes = S.build?.status;
+    await cargarBuild(); pintarBuild();
+    if (antes !== "completed" && S.build?.status === "completed") {
+      if (S.build.conclusion === "success") { aviso("Publicado: ya está en Shiori"); cargarTodo(); }
+      else aviso("La compilación falló: mira el registro en GitHub", true);
+    }
+  }, 8000);
+}
+
+// ───────────── Estado de cada extensión ─────────────
+function estado(e) {
+  if (e.p.activa === "false") return { t: "Pausada", c: "off" };
+  const pub = S.indice.find(x => x.pkg === e.pkg);
+  if (!pub) return { t: "Sin publicar", c: "warn" };
+  if (+pub.code < +(e.p.version || 1)) return { t: "Por publicar", c: "warn" };
+  return { t: "Publicada", c: "ok" };
+}
+
+// ───────────── Pintado ─────────────
+function pintar() {
+  if (!S.token) return pintarLogin();
+  const app = $("#app");
+  if (!$("header", app)) app.innerHTML = `
+    <header><div class="top">
+      <div class="logo">A</div>
+      <div class="brand"><b>Alejandría</b><span>Panel de extensiones</span></div>
+      <div class="sp"></div>
+      <a class="build" id="build" target="_blank" rel="noopener"></a>
+      <button class="btn icon ghost" title="Recargar" onclick="cargarTodo()">${I.ref}</button>
+      <button class="btn icon ghost" title="Cerrar sesión" onclick="salir()">${I.out}</button>
+    </div></header>
+    <div class="wrap">
+      <section class="hero">
+        <h1>Tu biblioteca de fuentes</h1>
+        <p>Modera, añade y publica las extensiones de Alejandría para Shiori.</p>
+        <div class="stats" id="stats"></div>
+      </section>
+      <div class="seg" id="seg"></div>
+      <main id="main"></main>
+    </div>`;
+  pintarBuild(); pintarStats(); pintarSeg(); pintarMain();
+}
+function pintarBuild() {
+  const b = $("#build"); if (!b) return;
+  const r = S.build;
+  let dot = "", txt = "Sin compilaciones";
+  if (r) {
+    if (r.status !== "completed") { dot = "run"; txt = "Compilando…"; }
+    else if (r.conclusion === "success") { dot = "ok"; txt = "Publicado " + hace(r.updated_at); }
+    else { dot = "bad"; txt = "Falló " + hace(r.updated_at); }
+    b.href = r.html_url;
+  } else b.href = `https://github.com/${DUENO}/${REPO}/actions`;
+  b.innerHTML = `<span class="dot ${dot}"></span>${txt}`;
+}
+function hace(f) {
+  const s = (Date.now() - new Date(f)) / 1000;
+  if (s < 60) return "ahora"; if (s < 3600) return `hace ${Math.round(s / 60)} min`;
+  if (s < 86400) return `hace ${Math.round(s / 3600)} h`; return `hace ${Math.round(s / 86400)} d`;
+}
+function pintarStats() {
+  const n = S.exts.length, act = S.exts.filter(e => e.p.activa !== "false").length;
+  const pub = S.exts.filter(e => estado(e).t === "Publicada").length;
+  $("#stats").innerHTML = [
+    [n, "Extensiones"], [pub, "Publicadas"], [n - act, "Pausadas"], [S.solicitudes.length, "Solicitudes"],
+  ].map(([v, t]) => `<div class="stat"><b>${S.cargando ? "–" : v}</b><span>${t}</span></div>`).join("");
+}
+function pintarSeg() {
+  const tabs = [["ext", "Extensiones"], ["sol", "Solicitudes", S.solicitudes.length], ["add", "Añadir"]];
+  const seg = $("#seg");
+  seg.innerHTML = `<span class="pill"></span>` + tabs.map(([k, t, n]) =>
+    `<button data-k="${k}" class="${S.pestana === k ? "on" : ""}">${t}${n ? `<span class="n">${n}</span>` : ""}</button>`).join("");
+  seg.querySelectorAll("button").forEach(b => b.onclick = () => { S.pestana = b.dataset.k; pintarSeg(); pintarMain(); });
+  requestAnimationFrame(() => {
+    const on = seg.querySelector("button.on"), pill = seg.querySelector(".pill");
+    pill.style.left = on.offsetLeft + "px"; pill.style.width = on.offsetWidth + "px";
+  });
+}
+function pintarMain() {
+  const m = $("#main");
+  if (S.pestana === "add") return pintarAnadir(m);
+  if (S.pestana === "sol") return pintarSolicitudes(m);
+  pintarExtensiones(m);
+}
+
+function pintarExtensiones(m) {
+  if (!$(".tools", m) || m.dataset.v !== "ext") {
+    m.dataset.v = "ext";
+    m.innerHTML = `
+      <div class="tools">
+        <div class="search">${I.find}<input id="q" placeholder="Buscar por nombre o web" value="${esc(S.q)}"></div>
+        <div class="chips" id="chips"></div>
+      </div><div id="lista"></div>`;
+    $("#q").oninput = e => { S.q = e.target.value; pintarLista(); };
+  }
+  const f = [["todas", "Todas"], ["pub", "Publicadas"], ["pend", "Pendientes"], ["pau", "Pausadas"], ["nsfw", "+18"]];
+  $("#chips").innerHTML = f.map(([k, t]) => `<button class="chip ${S.filtro === k ? "on" : ""}" data-k="${k}">${t}</button>`).join("");
+  $("#chips").querySelectorAll(".chip").forEach(c => c.onclick = () => { S.filtro = c.dataset.k; pintarExtensiones(m); });
+  pintarLista();
+}
+function pintarLista() {
+  const l = $("#lista");
+  if (S.cargando) { l.innerHTML = `<div class="grid">${"<div class='skel'></div>".repeat(4)}</div>`; return; }
+  const q = S.q.trim().toLowerCase();
+  const lista = S.exts.filter(e => {
+    const st = estado(e).t;
+    if (q && !(e.p.nombre.toLowerCase().includes(q) || (e.p.url || "").toLowerCase().includes(q))) return false;
+    return S.filtro === "todas" || (S.filtro === "pub" && st === "Publicada") || (S.filtro === "pau" && st === "Pausada")
+      || (S.filtro === "pend" && (st === "Por publicar" || st === "Sin publicar")) || (S.filtro === "nsfw" && e.p.nsfw === "true");
+  });
+  if (!S.exts.length) { l.innerHTML = `<div class="empty"><b>Aún no hay extensiones</b>Añade la primera con solo su nombre y su enlace.<br><br><button class="btn acc" onclick="irA('add')">${I.plus}Añadir extensión</button></div>`; return; }
+  if (!lista.length) { l.innerHTML = `<div class="empty"><b>Nada por aquí</b>Prueba con otro filtro o búsqueda.</div>`; return; }
+  l.innerHTML = `<div class="grid">${lista.map((e, i) => tarjeta(e, i)).join("")}</div>`;
+}
+function tarjeta(e, i) {
+  const st = estado(e), pausada = e.p.activa === "false";
+  const icono = e.tieneIcono ? rawIcono(e) : iconoLetra(e.p.nombre, 96);
+  return `<article class="card ${pausada ? "off" : ""}" style="animation-delay:${Math.min(i, 12) * 35}ms">
+    <div class="row">
+      <img class="ico" src="${icono}" alt="" loading="lazy" onerror="this.src='${iconoLetra(e.p.nombre, 96)}'">
+      <div class="meta"><b>${esc(e.p.nombre)}</b><a href="${esc(e.p.url)}" target="_blank" rel="noopener">${esc(host(e.p.url))}</a></div>
+    </div>
+    <div class="tags">
+      <span class="tag ${st.c}">${st.t}</span>
+      <span class="tag">${BANDERAS[e.lang] || "🌐"} ${IDIOMAS[e.lang] || e.lang}</span>
+      <span class="tag">v${esc(e.p.version || 1)}</span>
+      ${e.p.nsfw === "true" ? `<span class="tag nsfw">+18</span>` : ""}
+      ${e.codigo ? `<span class="tag">Código propio</span>` : ""}
+    </div>
+    <div class="acts">
+      <button class="btn" onclick="editar('${e.dir}')">${I.edit}Editar</button>
+      <button class="btn" onclick="pausar('${e.dir}')">${pausada ? I.play + "Activar" : I.pause + "Pausar"}</button>
+      <span class="sp"></span>
+      <a class="btn icon ghost" title="Abrir la web" href="${esc(e.p.url)}" target="_blank" rel="noopener">${I.web}</a>
+      <button class="btn icon danger" title="Eliminar" onclick="borrar('${e.dir}')">${I.del}</button>
+    </div>
+  </article>`;
+}
+function irA(k) { S.pestana = k; pintarSeg(); pintarMain(); }
+
+// ───────────── Añadir ─────────────
+let iconoSubido = null;
+function formulario(p = {}, nueva = true) {
+  return `
+    <div class="f"><label>Nombre</label><input class="in" id="f-nombre" placeholder="Manhwa Online" value="${esc(p.nombre || "")}" autocomplete="off"></div>
+    <div class="f"><label>Enlace de la web</label><input class="in" id="f-url" placeholder="https://manhwa-online.com" value="${esc(p.url || "")}" inputmode="url" autocomplete="off"></div>
+    <div class="two">
+      <div class="f"><label>Idioma</label><select class="in" id="f-lang" ${nueva ? "" : "disabled"}>${Object.entries(IDIOMAS).map(([k, v]) =>
+        `<option value="${k}" ${(p.lang || "es") === k ? "selected" : ""}>${BANDERAS[k]} ${v}</option>`).join("")}</select></div>
+      <div class="f"><label>Contenido</label><label class="switch"><span>+18</span><input type="checkbox" id="f-nsfw" ${p.nsfw === "true" || p.nsfw === true ? "checked" : ""}><span class="tg"></span></label></div>
+    </div>
+    <details class="adv"><summary>Opciones avanzadas (normalmente no hacen falta)</summary>
+      ${AVANZADOS.map(([k, t, ph]) => `<div class="f"><label>${t}</label><input class="in" id="f-${k}" placeholder="${esc(ph)}" value="${esc(p[k] || "")}"></div>`).join("")}
+    </details>`;
+}
+function pintarAnadir(m) {
+  m.dataset.v = "add"; iconoSubido = null;
+  m.innerHTML = `<div class="panel">
+    <h2 style="margin:0 0 4px;letter-spacing:-.02em">Nueva extensión</h2>
+    <p style="margin:0 0 20px;color:var(--muted);font-size:14px">Con el nombre y el enlace basta. Se compila y se publica sola en unos 3 minutos.</p>
+    ${formulario()}
+    <div class="preview"><img class="ico" id="pv-ico" alt=""><div style="min-width:0">
+      <b id="pv-nombre" style="display:block">—</b><code id="pv-pkg"></code><br>
+      <span class="subir" onclick="$('#f-ico').click()">Usar otro icono</span><input type="file" id="f-ico" accept="image/*" hidden>
+    </div></div>
+    <div class="pie"><button class="btn pri" id="crear">${I.rocket}Crear y publicar</button></div>
+  </div>`;
+  const vista = () => {
+    const n = $("#f-nombre").value.trim() || "Nueva", l = $("#f-lang").value;
+    $("#pv-ico").src = iconoSubido || iconoLetra(n, 96);
+    $("#pv-nombre").textContent = n;
+    $("#pv-pkg").textContent = `src/${l}/${slug(n)}`;
+  };
+  ["f-nombre", "f-lang"].forEach(id => $("#" + id).addEventListener("input", vista));
+  $("#f-url").addEventListener("blur", e => {
+    let u = e.target.value.trim(); if (u && !/^https?:\/\//.test(u)) e.target.value = "https://" + u;
+    if (!$("#f-nombre").value.trim() && u) { $("#f-nombre").value = host(e.target.value).split(".")[0].replace(/[-_]/g, " ").replace(/\b\w/g, c => c.toUpperCase()); vista(); }
+  });
+  $("#f-ico").onchange = async e => { if (e.target.files[0]) { iconoSubido = await iconoDeArchivo(e.target.files[0]); vista(); } };
+  $("#crear").onclick = () => crear();
+  vista();
+}
+function leerFormulario() {
+  const p = { nombre: $("#f-nombre").value.trim(), url: $("#f-url").value.trim().replace(/\/+$/, ""), nsfw: $("#f-nsfw").checked };
+  AVANZADOS.forEach(([k]) => { const v = $("#f-" + k).value.trim(); if (v) p[k] = v; });
+  if (p.url && !/^https?:\/\//.test(p.url)) p.url = "https://" + p.url;
+  return p;
+}
+function validar(p) {
+  if (!p.nombre) return "Escribe el nombre";
+  try { new URL(p.url); } catch { return "El enlace no es válido"; }
+  return null;
+}
+async function ocupado(btn, f) {
+  const html = btn.innerHTML; btn.disabled = true; btn.innerHTML = `<span class="spin"></span>Guardando…`;
+  try { await f(); } catch (e) { aviso(e.message, true); } finally { btn.disabled = false; btn.innerHTML = html; }
+}
+async function crear(desdeSolicitud) {
+  const p = leerFormulario(), err = validar(p);
+  if (err) return aviso(err, true);
+  const lang = $("#f-lang").value, id = slug(p.nombre), dir = `src/${lang}/${id}`;
+  if (S.exts.some(e => e.dir === dir)) return aviso("Ya existe una extensión con ese nombre e idioma", true);
+  const dup = S.exts.find(e => host(e.p.url) === host(p.url));
+  if (dup && !confirm(`«${dup.p.nombre}» ya usa ${host(p.url)}. ¿Crear otra igualmente?`)) return;
+  await ocupado(desdeSolicitud?.btn || $("#crear"), async () => {
+    const icono = (iconoSubido || iconoLetra(p.nombre)).split(",")[1];
+    await commit(`Nueva extensión: ${p.nombre}`, [
+      { ruta: `${dir}/extension.properties`, texto: escribirProps({ ...p, version: 1 }) },
+      { ruta: `${dir}/res/mipmap-xxxhdpi/ic_launcher.png`, base64: icono },
+    ]);
+    if (desdeSolicitud) await cerrarSolicitud(desdeSolicitud.num, `¡Añadida! «${p.nombre}» estará en Alejandría en unos minutos.`);
+    aviso(`«${p.nombre}» creada. Publicando…`);
+    cerrarHoja(); S.pestana = "ext"; await cargarTodo();
+  });
+}
+
+// ───────────── Editar / pausar / borrar ─────────────
+const porDir = d => S.exts.find(e => e.dir === d);
+function editar(dir) {
+  const e = porDir(dir); iconoSubido = null;
+  abrirHoja(`
+    <h2>${esc(e.p.nombre)}</h2><p class="sub">${esc(e.dir)} · v${esc(e.p.version || 1)}</p>
+    ${formulario({ ...e.p, lang: e.lang }, false)}
+    <div class="preview"><img class="ico" id="pv-ico" src="${e.tieneIcono ? rawIcono(e) : iconoLetra(e.p.nombre, 96)}" alt="">
+      <div><b>Icono</b><br><span class="subir" onclick="$('#f-ico').click()">Cambiar icono</span> · <span class="subir" id="ico-letra">Usar inicial</span>
+      <input type="file" id="f-ico" accept="image/*" hidden></div></div>
+    <div class="pie">
+      <button class="btn ghost" onclick="cerrarHoja()">Cancelar</button>
+      <button class="btn pri" id="guardar">${I.up}Guardar y publicar</button>
+    </div>`);
+  $("#f-ico").onchange = async ev => { if (ev.target.files[0]) { iconoSubido = await iconoDeArchivo(ev.target.files[0]); $("#pv-ico").src = iconoSubido; } };
+  $("#ico-letra").onclick = () => { iconoSubido = iconoLetra($("#f-nombre").value || e.p.nombre); $("#pv-ico").src = iconoSubido; };
+  $("#guardar").onclick = () => {
+    const p = leerFormulario(), err = validar(p);
+    if (err) return aviso(err, true);
+    ocupado($("#guardar"), async () => {
+      const nuevo = { ...p, version: (+e.p.version || 1) + 1, activa: e.p.activa === "false" ? false : undefined };
+      const cambios = [{ ruta: `${dir}/extension.properties`, texto: escribirProps(nuevo) }];
+      if (iconoSubido) cambios.push({ ruta: `${dir}/res/mipmap-xxxhdpi/ic_launcher.png`, base64: iconoSubido.split(",")[1] });
+      await commit(`Editar extensión: ${p.nombre} (v${nuevo.version})`, cambios);
+      aviso("Guardado. Shiori ofrecerá la actualización en unos minutos");
+      cerrarHoja(); await cargarTodo();
+    });
+  };
+}
+async function pausar(dir) {
+  const e = porDir(dir), pausada = e.p.activa === "false";
+  try {
+    const p = { ...e.p, nsfw: e.p.nsfw === "true", activa: pausada ? undefined : false, version: pausada ? (+e.p.version || 1) + 1 : e.p.version };
+    await commit(`${pausada ? "Activar" : "Pausar"} extensión: ${e.p.nombre}`, [{ ruta: `${dir}/extension.properties`, texto: escribirProps(p) }]);
+    aviso(pausada ? `«${e.p.nombre}» activada` : `«${e.p.nombre}» pausada: deja de ofrecerse en Shiori`);
+    await cargarTodo();
+  } catch (x) { aviso(x.message, true); }
+}
+function borrar(dir) {
+  const e = porDir(dir);
+  abrirHoja(`
+    <h2>¿Eliminar «${esc(e.p.nombre)}»?</h2>
+    <p class="sub">Se borra del repositorio y deja de ofrecerse en Shiori. Quien ya la tenga instalada la conserva, pero no recibirá más actualizaciones. Si solo quieres ocultarla un tiempo, mejor <b>Pausar</b>.</p>
+    <div class="pie">
+      <button class="btn ghost" onclick="cerrarHoja()">Cancelar</button>
+      <button class="btn danger" id="si">${I.del}Eliminar</button>
+    </div>`);
+  $("#si").onclick = () => ocupado($("#si"), async () => {
+    const arbol = await gh(`/git/trees/${RAMA}?recursive=1`);
+    const rutas = arbol.tree.filter(f => f.type === "blob" && f.path.startsWith(dir + "/")).map(f => ({ ruta: f.path, borrar: true }));
+    await commit(`Eliminar extensión: ${e.p.nombre}`, rutas);
+    aviso(`«${e.p.nombre}» eliminada`); cerrarHoja(); await cargarTodo();
+  });
+}
+
+// ───────────── Solicitudes ─────────────
+function pintarSolicitudes(m) {
+  m.dataset.v = "sol";
+  const nueva = `https://github.com/${DUENO}/${REPO}/issues/new?template=solicitud.yml`;
+  if (S.cargando) { m.innerHTML = `<div class="grid">${"<div class='skel'></div>".repeat(2)}</div>`; return; }
+  if (!S.solicitudes.length) {
+    m.innerHTML = `<div class="empty"><b>No hay solicitudes pendientes</b>Cualquiera puede pedir una web desde GitHub; aparecerán aquí para que las apruebes o las rechaces.<br><br>
+      <a class="btn ghost" href="${nueva}" target="_blank" rel="noopener">Ver el formulario de solicitud</a></div>`;
+    return;
+  }
+  m.innerHTML = `<div class="grid">${S.solicitudes.map((s, i) => {
+    const d = s.datos, ya = S.exts.find(e => host(e.p.url) === host(d.url));
+    return `<article class="card req" style="animation-delay:${i * 40}ms">
+      <div class="row"><img class="ico" src="${iconoLetra(d.nombre || "?", 96)}" alt="">
+        <div class="meta"><b>${esc(d.nombre || "Sin nombre")}</b><a href="${esc(d.url)}" target="_blank" rel="noopener">${esc(host(d.url) || "sin enlace")}</a></div></div>
+      <div class="tags"><span class="tag">${BANDERAS[d.idioma] || "🌐"} ${IDIOMAS[d.idioma] || d.idioma}</span>
+        ${d.nsfw ? `<span class="tag nsfw">+18</span>` : ""}${ya ? `<span class="tag warn">Ya existe: ${esc(ya.p.nombre)}</span>` : ""}</div>
+      ${d.notas ? `<div class="nota">${esc(d.notas)}</div>` : ""}
+      <div class="quien">#${s.number} · @${esc(s.user.login)} · ${hace(s.created_at)}</div>
+      <div class="acts">
+        <button class="btn acc" onclick="aprobar(${s.number})">${I.ok}Aprobar</button>
+        <button class="btn danger" onclick="rechazar(${s.number})">${I.no}Rechazar</button>
+        <span class="sp"></span>
+        <a class="btn icon ghost" title="Ver en GitHub" href="${s.html_url}" target="_blank" rel="noopener">${I.out}</a>
+      </div></article>`;
+  }).join("")}</div>`;
+}
+function aprobar(num) {
+  const s = S.solicitudes.find(x => x.number === num), d = s.datos; iconoSubido = null;
+  abrirHoja(`<h2>Aprobar solicitud #${num}</h2><p class="sub">Revisa los datos antes de crearla.</p>
+    ${formulario({ nombre: d.nombre, url: d.url, lang: IDIOMAS[d.idioma] ? d.idioma : "es", nsfw: d.nsfw })}
+    <div class="pie"><button class="btn ghost" onclick="cerrarHoja()">Cancelar</button>
+    <button class="btn pri" id="aprobar">${I.rocket}Crear y publicar</button></div>`);
+  $("#aprobar").onclick = () => crear({ num, btn: $("#aprobar") });
+}
+function rechazar(num) {
+  abrirHoja(`<h2>Rechazar solicitud #${num}</h2><p class="sub">Puedes dejar un motivo; se publica como comentario.</p>
+    <div class="f"><textarea class="in" id="motivo" rows="3" placeholder="Por ejemplo: la web ya no existe"></textarea></div>
+    <div class="pie"><button class="btn ghost" onclick="cerrarHoja()">Cancelar</button><button class="btn danger" id="rech">${I.no}Rechazar</button></div>`);
+  $("#rech").onclick = () => ocupado($("#rech"), async () => {
+    await cerrarSolicitud(num, $("#motivo").value.trim() || "Solicitud rechazada.", "not_planned");
+    aviso(`Solicitud #${num} rechazada`); cerrarHoja(); await cargarSolicitudes(); pintar();
+  });
+}
+async function cerrarSolicitud(num, comentario, motivo = "completed") {
+  await gh(`/issues/${num}/comments`, { method: "POST", body: JSON.stringify({ body: comentario }) });
+  await gh(`/issues/${num}`, { method: "PATCH", body: JSON.stringify({ state: "closed", state_reason: motivo }) });
+}
+
+// ───────────── Hoja ─────────────
+function abrirHoja(html) {
+  $("#hoja").innerHTML = `<div class="agarre"></div>` + html;
+  $("#velo").classList.add("on");
+}
+function cerrarHoja() { $("#velo").classList.remove("on"); }
+$("#velo").addEventListener("click", e => { if (e.target.id === "velo") cerrarHoja(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape") cerrarHoja(); });
+
+// ───────────── Sesión ─────────────
+function pintarLogin() {
+  const crearToken = "https://github.com/settings/tokens/new?scopes=repo,workflow&description=Panel%20Alejandr%C3%ADa";
+  $("#app").innerHTML = `<div class="login"><div class="panel">
+    <div class="logo">A</div><h1>Alejandría</h1>
+    <p>Panel para moderar y añadir las extensiones de tu repositorio.</p>
+    <ol>
+      <li><a href="${crearToken}" target="_blank" rel="noopener">Crea un token de GitHub</a> (ya viene marcado lo necesario). Ponle caducidad y pulsa <i>Generate token</i>.</li>
+      <li>Cópialo y pégalo aquí. Se guarda solo en este navegador.</li>
+    </ol>
+    <div class="f"><input class="in" id="tok" type="password" placeholder="ghp_…" autocomplete="off"></div>
+    <button class="btn pri" id="entrar" style="width:100%;justify-content:center">Entrar</button>
+  </div></div>`;
+  const entrar = async () => {
+    const t = $("#tok").value.trim(); if (!t) return;
+    const b = $("#entrar"); b.disabled = true; b.innerHTML = `<span class="spin"></span>Comprobando…`;
+    S.token = t;
+    try {
+      const r = await gh("");
+      if (!r.permissions?.push) throw new Error("Ese token no puede escribir en Alejandría");
+      localStorage.setItem("alj_token", t); $("#app").innerHTML = ""; cargarTodo();
+    } catch (e) { S.token = ""; aviso(e.message, true); b.disabled = false; b.textContent = "Entrar"; }
+  };
+  $("#entrar").onclick = entrar;
+  $("#tok").onkeydown = e => { if (e.key === "Enter") entrar(); };
+}
+function salir() { localStorage.removeItem("alj_token"); S.token = ""; $("#app").innerHTML = ""; pintar(); }
+
+if (S.token) cargarTodo(); else pintar();
+</script>
+</body>
+</html>

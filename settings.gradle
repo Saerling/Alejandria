@@ -10,7 +10,9 @@ include ':core'
 // Cada carpeta src/<idioma>/<nombre> que tenga extension.properties es una extensión.
 new File(rootDir, 'src').eachDir { idioma ->
     idioma.eachDir { ext ->
-        if (new File(ext, 'extension.properties').exists()) {
+        def props = new File(ext, 'extension.properties')
+        // activa=false (pausada desde el panel): no se compila ni se publica.
+        if (props.exists() && !(props.getText('UTF-8') =~ /(?m)^\s*activa\s*=\s*false\s*$/)) {
             def nombre = ":${idioma.name}-${ext.name}"
             include nombre
             project(nombre).projectDir = ext

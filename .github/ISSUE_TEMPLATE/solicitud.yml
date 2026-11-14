@@ -1,0 +1,36 @@
+name: Pedir una extensión
+description: Propón una web para añadirla a Alejandría
+title: "[Solicitud] "
+labels: ["solicitud"]
+body:
+  - type: input
+    id: nombre
+    attributes:
+      label: Nombre de la web
+      placeholder: Manhwa Online
+    validations:
+      required: true
+  - type: input
+    id: url
+    attributes:
+      label: Dirección
+      placeholder: https://manhwa-online.com
+    validations:
+      required: true
+  - type: dropdown
+    id: idioma
+    attributes:
+      label: Idioma
+      options: [es, en, pt, fr, it, de, ja, ko, zh, ru, id, vi, tr, all]
+    validations:
+      required: true
+  - type: checkboxes
+    id: nsfw
+    attributes:
+      label: Contenido
+      options:
+        - label: Tiene contenido +18
+  - type: textarea
+    id: notas
+    attributes:
+      label: Notas (opcional)

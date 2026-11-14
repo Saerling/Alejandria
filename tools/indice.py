@@ -23,6 +23,8 @@ indice = []
 for props in sorted(RAIZ.glob("src/*/*/extension.properties")):
     carpeta = props.parent; idioma = carpeta.parent.name; ext = carpeta.name
     p = leer_props(props)
+    if p.get("activa", "true").lower() == "false":
+        continue
     apk = carpeta / "build/outputs/apk/release" / f"{idioma}-{ext}-release.apk"
     if not apk.exists():
         print(f"AVISO: falta la APK de {idioma}/{ext}"); continue
