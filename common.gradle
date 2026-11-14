@@ -6,7 +6,7 @@ def p = new Properties()
 file('extension.properties').withReader('UTF-8') { p.load(it) }
 def idioma = projectDir.parentFile.name
 def id = projectDir.name
-def paquete = "eu.kanade.tachiyomi.extension.${idioma}.${id}"
+def paquete = "eu.kanade.tachiyomi.extension.${idioma}.alejandria.${id}"
 def codigo = p.getProperty('version', '1').trim().toInteger()
 def nsfw = p.getProperty('nsfw', 'false').trim().toBoolean()
 def tieneCodigo = file('src').exists() && fileTree('src').include('**/*.kt').files.size() > 0

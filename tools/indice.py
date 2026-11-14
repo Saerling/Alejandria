@@ -26,7 +26,7 @@ for props in sorted(RAIZ.glob("src/*/*/extension.properties")):
     apk = carpeta / "build/outputs/apk/release" / f"{idioma}-{ext}-release.apk"
     if not apk.exists():
         print(f"AVISO: falta la APK de {idioma}/{ext}"); continue
-    pkg = f"eu.kanade.tachiyomi.extension.{idioma}.{ext}"
+    pkg = f"eu.kanade.tachiyomi.extension.{idioma}.alejandria.{ext}"
     code = int(p.get("version", "1")); version = f"1.4.{code}"
     nombre_apk = f"tachiyomi-{idioma}.{ext}-v{version}.apk"
     shutil.copy(apk, salida / "apk" / nombre_apk)
