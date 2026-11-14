@@ -217,7 +217,7 @@ abstract class FuenteFacil : HttpSource() {
     }
 
     protected open fun capitulosEn(doc: Document, slug: String?): List<SChapter> {
-        val caps = LinkedHashMap<String, SChapter>()
+        val caps = LinkedHashMap<String, Cap>()
         for (a in doc.select("a[href]")) {
             val ruta = rutaDe(a.absUrl("href")) ?: continue
             val partes = ruta.trim('/').split('/')
@@ -225,28 +225,46 @@ abstract class FuenteFacil : HttpSource() {
             if (slug != null && partes[1] != slug) continue
             if (partes[2].lowercase() in noSonObras || partes[2].startsWith("#")) continue
             val url = "/" + partes.joinToString("/") + "/"
-            if (caps.containsKey(url)) continue
-            val texto = a.text().ifBlank { a.attr("title") }
-            val contexto = a.parent()?.text().orEmpty()
-            caps[url] = SChapter.create().apply {
+            val texto = textoSeparado(a).ifBlank { a.attr("title") }
+            // Botones como «Empezar: Capítulo 00» o «Último capítulo» enlazan a un capítulo, pero no son su fila.
+            val esBoton = Regex("""^(empezar|comenzar|continuar|seguir|leer|último|ultimo|primer|first|last|start|read)\b""", RegexOption.IGNORE_CASE)
+                .containsMatchIn(texto.trim())
+            val previo = caps[url]
+            if (previo != null && (esBoton || !previo.esBoton)) continue
+            val contexto = a.parent()?.let { textoSeparado(it) }.orEmpty()
+            caps[url] = Cap(SChapter.create().apply {
                 this.url = url
-                name = nombreCapitulo(texto, partes[2])
+                name = if (esBoton) nombreDeSlug(partes[2]) else nombreCapitulo(texto, partes[2])
                 chapter_number = numeroDe(name) ?: numeroDe(partes[2].replace('-', ' ')) ?: -1f
                 date_upload = fechaDe(texto).takeIf { it > 0 } ?: fechaDe(contexto)
-            }
+            }, esBoton)
         }
         // De más nuevo a más viejo.
-        return caps.values.sortedByDescending { it.chapter_number }
+        return caps.values.map { it.cap }.sortedByDescending { it.chapter_number }
+    }
+
+    private class Cap(val cap: SChapter, val esBoton: Boolean)
+
+    /** Texto de un elemento con espacios entre sus partes (jsoup pega «Capítulo 09» y «30.10.26» si van en etiquetas seguidas). */
+    protected fun textoSeparado(e: Element): String =
+        e.select("*").flatMap { it.textNodes() }.map { it.text().trim() }.filter { it.isNotEmpty() }.joinToString(" ")
+
+    /** «capitulo-09-5» → «Capítulo 09.5». */
+    protected open fun nombreDeSlug(slug: String): String {
+        val n = Regex("""(\d+)(?:[-.](\d+))?""").find(slug)
+        return if (n != null) "Capítulo " + n.groupValues[1] + (n.groupValues[2].takeIf { it.isNotEmpty() }?.let { ".$it" } ?: "")
+        else slug.replace('-', ' ').replaceFirstChar { it.uppercase() }
     }
 
     protected open fun nombreCapitulo(texto: String, slugCap: String): String {
         val limpio = texto
+            .replace(Regex("""\b\d{1,2}[./-]\d{1,2}[./-]\d{2,4}\b"""), "")
             .replace(Regex("""\b(NUEVO|NEW|Nuevo)\b"""), "")
             .replace(Regex("""\bhace\s+\d+\s+\w+""", RegexOption.IGNORE_CASE), "")
             .replace(Regex("""\b(ayer|hoy)\b""", RegexOption.IGNORE_CASE), "")
             .replace(Regex("""\d{1,2}/\d{1,2}/\d{2,4}"""), "")
             .replace(Regex("""\s+"""), " ").trim()
-        return limpio.ifBlank { slugCap.replace('-', ' ').replaceFirstChar { it.uppercase() } }
+        return limpio.ifBlank { nombreDeSlug(slugCap) }
     }
 
     private fun numeroDe(t: String): Float? =
@@ -275,8 +293,10 @@ abstract class FuenteFacil : HttpSource() {
             c.add(Calendar.DAY_OF_YEAR, -1); return c.timeInMillis
         }
         if (Regex("""\b(hoy|NUEVO|new)\b""", RegexOption.IGNORE_CASE).containsMatchIn(t)) return c.timeInMillis
-        Regex("""\d{1,2}/\d{1,2}/\d{4}""").find(t)?.let {
-            return runCatching { SimpleDateFormat("dd/MM/yyyy", Locale.ROOT).parse(it.value)!!.time }.getOrDefault(0L)
+        Regex("""\b(\d{1,2})[./-](\d{1,2})[./-](\d{2}|\d{4})\b""").find(t)?.let {
+            val (d, m, a) = it.destructured
+            val anio = if (a.length == 2) "20$a" else a
+            return runCatching { SimpleDateFormat("dd/MM/yyyy", Locale.ROOT).parse("$d/$m/$anio")!!.time }.getOrDefault(0L)
         }
         Regex("""\d{1,2} de \p{L}+ de \d{4}""").find(t)?.let {
             return runCatching { SimpleDateFormat("d 'de' MMMM 'de' yyyy", Locale("es")).parse(it.value)!!.time }.getOrDefault(0L)
