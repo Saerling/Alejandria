@@ -1,0 +1,50 @@
+name: Nueva extensión
+
+on:
+  workflow_dispatch:
+    inputs:
+      nombre:
+        description: "Nombre de la web (ej. Manhwa Online)"
+        required: true
+      url:
+        description: "Dirección de la web (ej. https://manhwa-online.com)"
+        required: true
+      idioma:
+        description: "Idioma (es, en, pt...)"
+        default: "es"
+        required: true
+      nsfw:
+        description: "¿Contenido +18?"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  crear:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install pillow
+      - name: Crear la extensión
+        env:
+          NOMBRE: ${{ inputs.nombre }}
+          URL: ${{ inputs.url }}
+          IDIOMA: ${{ inputs.idioma }}
+          NSFW: ${{ inputs.nsfw && '--nsfw' || '' }}
+        run: python3 tools/nueva.py "$NOMBRE" "$URL" "$IDIOMA" $NSFW
+      - name: Guardar
+        env:
+          NOMBRE: ${{ inputs.nombre }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src
+          git commit -m "Nueva extensión: $NOMBRE"
+          git push
+
+  publicar:
+    needs: crear
+    uses: ./.github/workflows/compilar.yml
+    secrets: inherit

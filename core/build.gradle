@@ -1,0 +1,22 @@
+apply plugin: 'com.android.library'
+apply plugin: 'org.jetbrains.kotlin.android'
+
+android {
+    namespace 'alejandria.core'
+    compileSdk 35
+    defaultConfig { minSdk 26 }
+    sourceSets { main { manifest.srcFile 'AndroidManifest.xml'; java.srcDirs = ['src']; res.srcDirs = ['res'] } }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions { jvmTarget = '1.8' }
+    buildFeatures { buildConfig false }
+}
+
+dependencies {
+    compileOnly 'com.github.keiyoushi:extensions-lib:v1.4.2.1'
+    compileOnly 'org.jetbrains.kotlin:kotlin-stdlib:2.2.21'
+    compileOnly 'com.squareup.okhttp3:okhttp:5.3.2'
+    compileOnly 'org.jsoup:jsoup:1.17.2'
+}

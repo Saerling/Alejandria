@@ -1,0 +1,63 @@
+name: Compilar y publicar
+
+on:
+  push:
+    branches: [main]
+    paths: ["src/**", "core/**", "common.gradle", "build.gradle", "settings.gradle", "tools/**"]
+  workflow_dispatch:
+  workflow_call:
+
+concurrency:
+  group: publicar
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  compilar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Preparar la firma
+        env:
+          FIRMA_JKS: ${{ secrets.FIRMA_JKS }}
+        run: |
+          if [ -z "$FIRMA_JKS" ]; then
+            echo "::error::Falta el secreto FIRMA_JKS (mira el README, sección «Firma»)."; exit 1
+          fi
+          echo "$FIRMA_JKS" | base64 -d > firma.jks
+
+      - name: Compilar extensiones
+        env:
+          KEY_STORE_PASSWORD: ${{ secrets.FIRMA_CLAVE }}
+          ALIAS: alejandria
+        run: ./gradlew assembleRelease --no-daemon
+
+      - name: Armar el índice
+        env:
+          KEY_STORE_PASSWORD: ${{ secrets.FIRMA_CLAVE }}
+        run: |
+          HUELLA=$(keytool -exportcert -alias alejandria -keystore firma.jks -storepass "$KEY_STORE_PASSWORD" | sha256sum | cut -d' ' -f1)
+          python3 tools/indice.py salida "$HUELLA"
+          rm -f firma.jks
+
+      - name: Publicar en la rama repo
+        run: |
+          cd salida
+          git init -q -b repo
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -q -m "Actualizar repositorio"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" repo

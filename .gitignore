@@ -1,0 +1,7 @@
+.gradle/
+build/
+local.properties
+firma.jks
+*.apk
+salida/
+__pycache__/

@@ -1,0 +1,90 @@
+// Configuración compartida de todas las extensiones. No hace falta tocar este archivo.
+apply plugin: 'com.android.application'
+apply plugin: 'org.jetbrains.kotlin.android'
+
+def p = new Properties()
+file('extension.properties').withReader('UTF-8') { p.load(it) }
+def idioma = projectDir.parentFile.name
+def id = projectDir.name
+def paquete = "eu.kanade.tachiyomi.extension.${idioma}.${id}"
+def codigo = p.getProperty('version', '1').trim().toInteger()
+def nsfw = p.getProperty('nsfw', 'false').trim().toBoolean()
+def tieneCodigo = file('src').exists() && fileTree('src').include('**/*.kt').files.size() > 0
+def clase = p.getProperty('clase', '.Fuente').trim()
+
+// Sin código propio: se genera la fuente a partir de extension.properties (FuenteFacil).
+def generado = new File(buildDir, 'generated/alejandria')
+if (!tieneCodigo) {
+    def esc = { String s -> s.replace('\\', '\\\\').replace('"', '\\"').replace('$', '\\$') }
+    def opcionales = [
+        biblioteca: 'rutaBiblioteca', recientes: 'rutaRecientes', busqueda: 'rutaBusqueda',
+        imagenes: 'selectorImagenes',
+    ]
+    def extra = opcionales.findAll { k, v -> p.getProperty(k) }.collect { k, v ->
+        "    override val $v = \"${esc(p.getProperty(k).trim())}\""
+    }.join('\n')
+    def dir = new File(generado, paquete.replace('.', '/'))
+    dir.mkdirs()
+    new File(dir, 'Fuente.kt').setText("""package $paquete
+
+import alejandria.core.FuenteFacil
+
+class Fuente : FuenteFacil() {
+    override val name = "${esc(p.getProperty('nombre').trim())}"
+    override val baseUrl = "${esc(p.getProperty('url').trim().replaceAll('/+$', ''))}"
+    override val lang = "$idioma"
+$extra
+}
+""", 'UTF-8')
+    clase = '.Fuente'
+}
+
+android {
+    namespace paquete
+    compileSdk 35
+    defaultConfig {
+        applicationId paquete
+        minSdk 26
+        targetSdk 35
+        versionCode codigo
+        versionName "1.4.${codigo}"
+        manifestPlaceholders = [appName: "Tachiyomi: ${p.getProperty('nombre').trim()}", extClass: clase, nsfw: nsfw ? 1 : 0]
+    }
+    sourceSets {
+        main {
+            manifest.srcFile rootProject.file('core/ExtManifest.xml')
+            java.srcDirs = tieneCodigo ? ['src'] : [generado]
+            res.srcDirs = ['res']
+        }
+    }
+    signingConfigs {
+        release {
+            storeFile rootProject.file('firma.jks')
+            storePassword System.getenv('KEY_STORE_PASSWORD')
+            keyAlias System.getenv('ALIAS')
+            keyPassword System.getenv('KEY_PASSWORD') ?: System.getenv('KEY_STORE_PASSWORD')
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            if (rootProject.file('firma.jks').exists()) signingConfig signingConfigs.release
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions { jvmTarget = '1.8' }
+    buildFeatures { buildConfig false }
+    dependenciesInfo { includeInApk false; includeInBundle false }
+    lint { abortOnError false; checkReleaseBuilds false }
+}
+
+dependencies {
+    implementation project(':core')
+    compileOnly 'com.github.keiyoushi:extensions-lib:v1.4.2.1'
+    compileOnly 'org.jetbrains.kotlin:kotlin-stdlib:2.2.21'
+    compileOnly 'com.squareup.okhttp3:okhttp:5.3.2'
+    compileOnly 'org.jsoup:jsoup:1.17.2'
+}
