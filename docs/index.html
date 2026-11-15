@@ -2,6 +2,8 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://raw.githubusercontent.com https://avatars.githubusercontent.com https://*.githubusercontent.com; connect-src https://api.github.com https://raw.githubusercontent.com; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b0b0f">
 <title>Alejandría · Panel</title>
@@ -208,7 +210,7 @@ const I = {
 
 // ───────────── Estado ─────────────
 const S = {
-  token: localStorage.getItem("alj_token") || "",
+  token: (localStorage.removeItem("alj_token"), sessionStorage.getItem("alj_token")) || "",
   exts: [], indice: [], solicitudes: [], build: null,
   pestana: "ext", filtro: "todas", q: "", cargando: true,
 };
@@ -691,12 +693,12 @@ document.addEventListener("keydown", e => { if (e.key === "Escape") cerrarHoja()
 
 // ───────────── Sesión ─────────────
 function pintarLogin() {
-  const crearToken = "https://github.com/settings/tokens/new?scopes=repo,workflow&description=Panel%20Alejandr%C3%ADa";
+  const crearToken = "https://github.com/settings/personal-access-tokens/new?name=Panel%20Alejandr%C3%ADa&expires_in=30&contents=write&actions=write";
   $("#app").innerHTML = `<div class="login"><div class="panel">
     <div class="logo">A</div><h1>Alejandría</h1>
     <p>Panel para moderar y añadir las extensiones de tu repositorio.</p>
     <ol>
-      <li><a href="${crearToken}" target="_blank" rel="noopener">Crea un token de GitHub</a> (ya viene marcado lo necesario). Ponle caducidad y pulsa <i>Generate token</i>.</li>
+      <li><a href="${crearToken}" target="_blank" rel="noopener">Crea un token de GitHub</a> (fine-grained). En <i>Repository access</i> elige <b>solo Saerling/Alejandria</b>; los permisos ya vienen marcados. Pulsa <i>Generate token</i>. Se guarda solo mientras esta pestaña esté abierta.</li>
       <li>Cópialo y pégalo aquí. Se guarda solo en este navegador.</li>
     </ol>
     <div class="f"><input class="in" id="tok" type="password" placeholder="ghp_…" autocomplete="off"></div>
@@ -709,13 +711,13 @@ function pintarLogin() {
     try {
       const r = await gh("");
       if (!r.permissions?.push) throw new Error("Ese token no puede escribir en Alejandría");
-      localStorage.setItem("alj_token", t); $("#app").innerHTML = ""; cargarTodo();
+      sessionStorage.setItem("alj_token", t); localStorage.removeItem("alj_token"); $("#app").innerHTML = ""; cargarTodo();
     } catch (e) { S.token = ""; aviso(e.message, true); b.disabled = false; b.textContent = "Entrar"; }
   };
   $("#entrar").onclick = entrar;
   $("#tok").onkeydown = e => { if (e.key === "Enter") entrar(); };
 }
-function salir() { localStorage.removeItem("alj_token"); S.token = ""; $("#app").innerHTML = ""; pintar(); }
+function salir() { sessionStorage.removeItem("alj_token"); localStorage.removeItem("alj_token"); S.token = ""; $("#app").innerHTML = ""; pintar(); }
 
 if (S.token) cargarTodo(); else pintar();
 </script>

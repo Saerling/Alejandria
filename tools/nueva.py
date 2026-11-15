@@ -15,6 +15,14 @@ if not ident or ident[0].isdigit():
     ident = "w" + ident
 if not url.startswith("http"):
     url = "https://" + url
+# Validación: evita rutas fuera de src/ e inyección de líneas en extension.properties
+url = re.sub(r"^http://", "https://", url)
+if not re.fullmatch(r"[a-z]{2,3}(-[a-z]{2})?|all", idioma):
+    sys.exit("Idioma inválido (usa es, en, pt-br...)")
+if not re.fullmatch(r"https://[A-Za-z0-9.-]+(:\d+)?(/[\w\-./%~]*)?", url):
+    sys.exit("Dirección inválida")
+if len(nombre) > 60 or re.search(r"[\r\n=\\]", nombre):
+    sys.exit("Nombre inválido (máx. 60 caracteres, sin saltos de línea ni '=')")
 carpeta = pathlib.Path(__file__).resolve().parent.parent / "src" / idioma / ident
 if carpeta.exists():
     sys.exit(f"Ya existe {carpeta}")
